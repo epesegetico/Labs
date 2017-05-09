@@ -1,5 +1,5 @@
 % QUANTIZER
-% quantiz is the generic quantizer - i don't have to put +V and -V
+% quantiz is the generic quantizer - i have to set +V and -V
 % to avoid clipping. [index,quants] = quantiz(sig,partition,codebook)
 % the codebook in the case of the uniform quantizer is the array
 % with the middle value of the intervals (TEST THIS)
@@ -20,11 +20,6 @@
 % e = Vout-Vin - S/N has the usual definition
 % Plot for different M the theoretical pcm performance
 
-%PCM performance simulation
-%BER = logspace(-9,-1)
-%Set different Pe
-%SNR = ...
-
 % COMPANDER
 % Use the u-Law
 
@@ -32,12 +27,6 @@
 % [partition,codebook] = lloyds(training_set,initcodebook)
 % training_set is a portion of the signal (heavy to be loaded with large
 % samples). Initial codebook can be the uniform partition
-
-
-%Generation of a signal with uniform PDF
-
-
-% MANCA FUNZIONE HISTOGRAM
 
 
 close all
@@ -54,6 +43,8 @@ V = 8;
     histogram(signal,'NumBins',50,'BinLimits',[-V V],'Normalization','pdf');
     axis([-10 10 0 0.1])
     grid on
+    
+    
     
     pause
 for n=4:2:8
