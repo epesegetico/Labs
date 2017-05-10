@@ -1,5 +1,3 @@
-% TEST REPOs form GITHUB
-
 % QUANTIZER
 % quantiz is the generic quantizer - i have to set +V and -V
 % to avoid clipping. [index,quants] = quantiz(sig,partition,codebook)
@@ -47,8 +45,8 @@ V = 8;
     grid on
     
     
+
     
-    pause
 for n=4:2:8
     
    
@@ -93,7 +91,7 @@ for n=4:2:8
     
     SNRth = 10*log10((M^2)./(1+4*(M^2-1).*Pbth));
     semilogx(Pbth,SNRth,'r-');
-    
+    pause
 end
 
 
