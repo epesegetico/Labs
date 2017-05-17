@@ -29,11 +29,11 @@
 %In frequency
 %1) fft to get X(f) -> fftshift(X(f))
 %2) Y(f) = X(f).*H(f)
-%3) ifft(Y(f)) 
+%3) ifft(Y(f))
 
 %SAMPLING
 %Given y(t) -> the sample can be obtained as sampled = y(1:Ns:end);
-%Which is the optimum sample? 
+%Which is the optimum sample?
 %a) from the eye diagram - y(topt:Ns:end);
 %b) bruteforce approach - try all possible Ns sampling instant in a for
 %   cycle
@@ -49,21 +49,21 @@
 %BE CAREFUL WITH THE ALIGNMENT OF THE VECTORS
 
 %HOW MANY BITS SHOULD I SIMULATE? #errors = BER*#bits -> i should see the
-%errors,so 10-100 errors minimum 
+%errors,so 10-100 errors minimum
 close all
 clear all
 
 Ns = 4;
 Nbits = 1e6;
 
-R = randi([0 1],[Nbits, 1]);
+Rin = randi([0 1],[Nbits, 1]);
 
 ak = zeros(Nbits,1);
 
 %Mapping dei valori
 
-for ii = 1:length(R)
-    if R(ii) == 0
+for ii = 1:length(Rin)
+    if Rin(ii) == 0
         ak(ii) = -1;
     else
         ak(ii) = 1;
@@ -73,12 +73,15 @@ end
 
 x = rectpulse(ak,Ns);
 
-   
+
 % AWGN
+
 
 sigmaDB = zeros(8,1);
 sigma = zeros(8,1);
 EbNo = linspace(1,8,8);
+
+h = rectpulse(abs(ak(1)),Ns);
 
 
 for ii = 1:8
@@ -89,16 +92,43 @@ for ii = 1:8
     N = Nbits*Ns;
     
     R = stdev(ii)*randn(N,1);
-    hold on
-    plot(EbNo,sigma,'r*');
-    grid on
+    
     
     xtx = x+R;
     
+    xrx = conv(xtx,h);
     
+    %xnoiseless = conv(x,h,'valid');
+    %ed = comm.EyeDiagram();
+    %ed(xrx);
+    
+    pause
+    
+    
+    
+    topt = 4;
+    
+    
+    
+    
+    y = xrx(topt:Ns:end);
+    
+    yfin = zeros(Nbits,1);
+    Vth = 0;
+    
+    for ii=1:length(y)
+        if y(ii)>Vth
+            yfin(ii) = 1;
+        else
+            yfin(ii) = 0;
+        end
+    end
+    
+    
+    errors = sum(abs(yfin-Rin))
+    
+    BER = errors/Nbits
 end
-
-
 
 
 
