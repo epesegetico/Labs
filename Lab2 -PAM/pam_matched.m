@@ -54,7 +54,7 @@ close all
 clear all
 
 Ns = 4;
-Nbits = 1e6;
+Nbits = 1e3;
 
 Rin = randi([0 1],[Nbits, 1]);
 
@@ -78,8 +78,13 @@ x = rectpulse(ak,Ns);
 
 
 sigmaDB = zeros(8,1);
-sigma = zeros(8,1);
+sigma = sigmaDB;
+
+BER = sigma;
+BERth = sigma;
 EbNo = linspace(1,8,8);
+
+
 
 h = rectpulse(abs(ak(1)),Ns);
 
@@ -100,13 +105,13 @@ for ii = 1:8
     
     %xnoiseless = conv(x,h,'valid');
     %ed = comm.EyeDiagram();
-    %ed(xrx);
-    
-    pause
+    %ed(xnoiseless);
     
     
     
-    topt = 4;
+    
+    
+    topt = Ns;
     
     
     
@@ -116,19 +121,29 @@ for ii = 1:8
     yfin = zeros(Nbits,1);
     Vth = 0;
     
-    for ii=1:length(y)
-        if y(ii)>Vth
-            yfin(ii) = 1;
+    for jj=1:length(y)
+        if y(jj)>Vth
+            yfin(jj) = 1;
         else
-            yfin(ii) = 0;
+            yfin(jj) = 0;
         end
     end
     
     
-    errors = sum(abs(yfin-Rin))
+    errors = sum(abs(yfin-Rin));
     
-    BER = errors/Nbits
+    BER(ii) = errors/Nbits;
+    BERth(ii) = 1/2*erfc(sqrt(Ns/(2*sigma(ii))));
+
+    
 end
 
+semilogy(EbNo,BERth,'r-');
+hold on
+semilogy(EbNo,BER,'bo');
 
 
+%Si osserva che col diminuire di Nbits il comportamento si discosta molto
+%da quello teorico
+
+%DA VERIFICARE LA FORMULA DEL BERth (Teorico)
