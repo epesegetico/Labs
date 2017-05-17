@@ -50,7 +50,8 @@
 
 %HOW MANY BITS SHOULD I SIMULATE? #errors = BER*#bits -> i should see the
 %errors,so 10-100 errors minimum 
-
+close all
+clear all
 
 Ns = 4;
 Nbits = 1e6;
@@ -59,6 +60,8 @@ R = randi([0 1],[Nbits, 1]);
 
 ak = zeros(Nbits,1);
 
+%Mapping dei valori
+
 for ii = 1:length(R)
     if R(ii) == 0
         ak(ii) = -1;
@@ -66,30 +69,33 @@ for ii = 1:length(R)
         ak(ii) = 1;
     end
     
-    
 end
 
 x = rectpulse(ak,Ns);
 
-    
+   
 % AWGN
-sigmaDB = zeros(7,1);
-sigma = zeros(7,1);
-EbNo = linspace(2,8,7);
+
+sigmaDB = zeros(8,1);
+sigma = zeros(8,1);
+EbNo = linspace(1,8,8);
 
 
-for ii = 2:8
-    sigmaDB(ii-1) = ii;
+for ii = 1:8
+    sigma(ii) = (Ns/2)*10^(-ii/10);
     
-    sigma(ii-1) = (10^(sigmaDB(ii-1)/10))/2;
-    stdev = sqrt(sigma);
+    stdev(ii) = sqrt(sigma(ii));
     
     N = Nbits*Ns;
     
-    R = stdev(ii-1)*randn(N,1);
+    R = stdev(ii)*randn(N,1);
+    hold on
+    plot(EbNo,sigma,'r*');
+    grid on
     
-    x = x+R;
-   
+    xtx = x+R;
+    
+    
 end
 
 
