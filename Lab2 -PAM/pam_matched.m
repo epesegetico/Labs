@@ -54,7 +54,7 @@ close all
 clear all
 
 Ns = 4;
-Nbits = 1e3;
+Nbits = 1e6;  
 
 Rin = randi([0 1],[Nbits, 1]);
 
@@ -133,10 +133,12 @@ for ii = 1:8
     errors = sum(abs(yfin-Rin));
     
     BER(ii) = errors/Nbits;
-    BERth(ii) = 1/2*erfc(sqrt(Ns/(2*sigma(ii))));
-
+    
     
 end
+
+
+BERth = berawgn(EbNo,'pam',2);  %BER Teorico per 2-PAM - Da verificare
 
 semilogy(EbNo,BERth,'r-');
 hold on
@@ -146,4 +148,3 @@ semilogy(EbNo,BER,'bo');
 %Si osserva che col diminuire di Nbits il comportamento si discosta molto
 %da quello teorico
 
-%DA VERIFICARE LA FORMULA DEL BERth (Teorico)
