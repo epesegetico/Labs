@@ -23,6 +23,23 @@ for ii = 1:length(Rin)
     end
 end
 
+x = rectpulse(ak,Ns);
+Ps = mean(x.^2);
+X = fftshift(fft(x));
+
+
+%AWGN 
+
+
+EbNo = linspace(1,8,8);
+
+sigma = (Ps*Ns/2)*10.^(-EbNo./10);
+
+stdev = sigma.^(1/2);
+
+R = stdev.*randn(N,1);
+
+
 %CREAZIONE DEL FILTRO 
 %Il filtro ideale va in frequenza da -B/2 a B/2 -> B è variabile
 %L'asse delle frequenze va da -Bsim/2 a Bsim/2
@@ -33,16 +50,10 @@ end
 df = 1/Nbits;
 
 B = 1;
-
-x = rectpulse(ak,Ns);
-
-Ps = mean(x.^2);
-
-X = fftshift(fft(x));
-
 f = [-Ns/2:df:Ns/2-df];
-
 H = abs(f)<B;
+
+
 
 %Situazione senza rumore
 
@@ -52,27 +63,14 @@ y = real(ifft(fftshift((Y))));
 
 %pause
 
-EbNo = linspace(1,8,8);
-sigma = zeros(8,1);
-stdev = sigma;
-
-
+topt = Ns;
+Vth = 0;
 
 for ii = 1:8
+  
     
-    
-    
-    sigma(ii) = (Ps*Ns/2)*10^(-EbNo(ii)/10);
-    stdev(ii) = sqrt(sigma(ii));
-    
-    
-    
-    R = stdev(ii)*randn(N,1);
-    
-    
-    xtx = x+R;
-    
-    %valid o non valid??
+    xtx = x+R(:,ii);
+   
     
     Xtx = fftshift(fft(xtx));
     
@@ -80,37 +78,28 @@ for ii = 1:8
     Xrx = Xtx.*H.';
     
     xrx = real(ifft(fftshift(Xrx)));
+        
     
     
-    topt = Ns;
-    
-    
-    
-    
-    y = xrx(2:topt:end);
-    
-    
-    yfin = zeros(Nbits,1);
-
-    
-    Vth = 0;
+    y = xrx(2:topt:end);  
     
     for jj = 1:1:length(y)
         if y(jj)>Vth
-            yfin(jj) = 1;
+            y(jj) = 1;
         else
-            yfin(jj) = 0;
+            y(jj) = 0;
         end
     end
     
 
-    errors = sum(abs(yfin-Rin));
+    errors = sum(abs(y-Rin));
 
     
     BER(ii) = errors/Nbits;
     
    
 end
+
 
 EbNolin = 10.^(EbNo./10);
 

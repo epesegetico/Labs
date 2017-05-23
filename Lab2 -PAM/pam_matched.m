@@ -55,6 +55,7 @@ clear all
 
 Ns = 8;
 Nbits = 1e6;  
+N = Nbits*Ns;
 
 Rin = randi([0 1],[Nbits, 1]);
 
@@ -77,67 +78,49 @@ Ps = mean(x.^2);
 % AWGN
 
 
-sigmaDB = zeros(8,1);
-sigma = sigmaDB;
-
-BER = zeros(8,1);
-BERth = sigma;
-
 EbNo = linspace(1,8,8);
+
+sigma = (Ps*Ns/2)*10.^(-EbNo./10);
+
+stdev = sigma.^(1/2);
+
+R = stdev.*randn(N,1);
 
 %Filtro normalizzato
 
 h = 1/Ns*rectpulse(1,Ns);
 
-N = Nbits*Ns;
 
-xnoiseless = conv(x,h,'valid');
+%Situazione senza rumore
 
+%xnoiseless = conv(x,h,'valid');
 %eyediagram(xnoiseless(1:1000*Ns),2*Ns,2*Ns)
 %pause 
 
-for ii = 1:8
+Vth = 0;
+topt = Ns;
+
+for ii = 1:length(EbNo)
     
     
-    
-    sigma(ii) = (Ps*Ns/2)*10^(-EbNo(ii)/10);
-    stdev(ii) = sqrt(sigma(ii));
-    
-    
-    
-    R = stdev(ii)*randn(N,1);
-    
-    
-    xtx = x+R;
-    
-    %valid o non valid??
-    
+    xtx = x+R(:,ii);
     xrx = conv(xtx,h,'valid');
     
     %eyediagram(xrx(1:1000*Ns),2*Ns,2*Ns);
    
-    
-    topt = Ns;
-    
-    
-    
+      
     y = xrx(1:topt:end);
     
-    yfin = zeros(Nbits,1);
-
-    
-    Vth = 0;
-    
-    for jj = 1:1:length(y)
+    for jj = 1:length(y)
         if y(jj)>Vth
-            yfin(jj) = 1;
+            y(jj) = 1;
         else
-            yfin(jj) = 0;
+            y(jj) = 0;
         end
     end
     
 
-    errors = sum(abs(yfin-Rin));
+    errors = sum(abs(y-Rin));
 
     
     BER(ii) = errors/Nbits;
@@ -156,4 +139,5 @@ semilogy(EbNo,BER,'b*');
 
 %Si osserva che col diminuire di Nbits il comportamento si discosta molto
 %da quello teorico
+
 
