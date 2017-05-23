@@ -53,7 +53,7 @@
 close all
 clear all
 
-Ns = 4;
+Ns = 8;
 Nbits = 1e6;  
 
 Rin = randi([0 1],[Nbits, 1]);
@@ -72,7 +72,7 @@ for ii = 1:length(Rin)
 end
 
 x = rectpulse(ak,Ns);
-
+Ps = mean(x.^2);
 
 % AWGN
 
@@ -80,48 +80,55 @@ x = rectpulse(ak,Ns);
 sigmaDB = zeros(8,1);
 sigma = sigmaDB;
 
-BER = sigma;
+BER = zeros(8,1);
 BERth = sigma;
+
 EbNo = linspace(1,8,8);
 
+%Filtro normalizzato
 
+h = 1/Ns*rectpulse(1,Ns);
 
-h = rectpulse(abs(ak(1)),Ns);
+N = Nbits*Ns;
 
+xnoiseless = conv(x,h,'valid');
+
+%eyediagram(xnoiseless(1:1000*Ns),2*Ns,2*Ns)
+%pause 
 
 for ii = 1:8
-    sigma(ii) = (Ns/2)*10^(-ii/10);
     
+    
+    
+    sigma(ii) = (Ps*Ns/2)*10^(-EbNo(ii)/10);
     stdev(ii) = sqrt(sigma(ii));
     
-    N = Nbits*Ns;
+    
     
     R = stdev(ii)*randn(N,1);
     
     
     xtx = x+R;
     
-    xrx = conv(xtx,h);
+    %valid o non valid??
     
-    %xnoiseless = conv(x,h,'valid');
-    %ed = comm.EyeDiagram();
-    %ed(xnoiseless);
+    xrx = conv(xtx,h,'valid');
     
-    
-    
-    
+    %eyediagram(xrx(1:1000*Ns),2*Ns,2*Ns);
+   
     
     topt = Ns;
     
     
     
-    
-    y = xrx(topt:Ns:end);
+    y = xrx(1:topt:end);
     
     yfin = zeros(Nbits,1);
+
+    
     Vth = 0;
     
-    for jj=1:length(y)
+    for jj = 1:1:length(y)
         if y(jj)>Vth
             yfin(jj) = 1;
         else
@@ -129,20 +136,22 @@ for ii = 1:8
         end
     end
     
-    
+
     errors = sum(abs(yfin-Rin));
+
     
     BER(ii) = errors/Nbits;
     
-    
+   
 end
 
+EbNolin = 10.^(EbNo./10);
 
-BERth = berawgn(EbNo,'pam',2);  %BER Teorico per 2-PAM - Da verificare
+BERth = 1/2 * erfc(EbNolin.^0.5);  %BER Teorico per 2-PAM
 
 semilogy(EbNo,BERth,'r-');
 hold on
-semilogy(EbNo,BER,'bo');
+semilogy(EbNo,BER,'b*');
 
 
 %Si osserva che col diminuire di Nbits il comportamento si discosta molto
