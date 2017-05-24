@@ -14,14 +14,7 @@ ak = zeros(Nbits,1);
 
 
 %Mapping dei valori
-
-for ii = 1:length(Rin)
-    if Rin(ii) == 0
-        ak(ii) = -1;
-    else
-        ak(ii) = 1;
-    end
-end
+ak = 2*Rin-1;
 
 x = rectpulse(ak,Ns);
 Ps = mean(x.^2);
@@ -49,21 +42,21 @@ R = stdev.*randn(N,1);
 
 df = 1/Nbits;
 
-B = 1;
-f = [-Ns/2:df:Ns/2-df];
+B = 1;  %Scegliere valore
+f = [-Ns/2:df:Ns/2-df]';
 H = abs(f)<B;
 
 
 
 %Situazione senza rumore
 
-Y = X.*H.';
+Y = X.*H;
 y = real(ifft(fftshift((Y))));
-%eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
+eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
 
 %pause
 
-topt = Ns;
+topt = 2;
 Vth = 0;
 
 for ii = 1:8
@@ -75,13 +68,13 @@ for ii = 1:8
     Xtx = fftshift(fft(xtx));
     
     %eyediagram(xrx(1:1000*Ns),2*Ns,2*Ns);
-    Xrx = Xtx.*H.';
+    Xrx = Xtx.*H;
     
     xrx = real(ifft(fftshift(Xrx)));
         
     
     
-    y = xrx(2:topt:end);  
+    y = xrx(topt:Ns:end);  
     
     for jj = 1:1:length(y)
         if y(jj)>Vth

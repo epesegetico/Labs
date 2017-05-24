@@ -63,16 +63,10 @@ ak = zeros(Nbits,1);
 
 %Mapping dei valori
 
-for ii = 1:length(Rin)
-    if Rin(ii) == 0
-        ak(ii) = -1;
-    else
-        ak(ii) = 1;
-    end
-    
-end
+ak = 2*Rin-1;
 
 x = rectpulse(ak,Ns);
+
 Ps = mean(x.^2);
 
 % AWGN
@@ -93,12 +87,12 @@ h = 1/Ns*rectpulse(1,Ns);
 
 %Situazione senza rumore
 
-%xnoiseless = conv(x,h,'valid');
-%eyediagram(xnoiseless(1:1000*Ns),2*Ns,2*Ns)
+xnoiseless = conv(x,h,'valid');
+eyediagram(xnoiseless(1:1000*Ns),2*Ns,2*Ns)
 %pause 
 
 Vth = 0;
-topt = Ns;
+topt = 1;
 
 for ii = 1:length(EbNo)
     
@@ -109,7 +103,7 @@ for ii = 1:length(EbNo)
     %eyediagram(xrx(1:1000*Ns),2*Ns,2*Ns);
    
       
-    y = xrx(1:topt:end);
+    y = xrx(topt:Ns:end);
     
     for jj = 1:length(y)
         if y(jj)>Vth

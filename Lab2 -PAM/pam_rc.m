@@ -13,14 +13,7 @@ ak = zeros(Nbits,1);
 
 %Mapping dei valori
 
-for ii = 1:length(Rin)
-    if Rin(ii) == 0
-        ak(ii) = -1;
-    else
-        ak(ii) = 1;
-    end
-end
-
+ak = 2*Rin-1;
 
 x = rectpulse(ak,Ns);
 Ps = mean(x.^2);
@@ -41,24 +34,23 @@ R = stdev.*randn(N,1);
 
 %CREAZIONE DEL FILTRO 
 
-B = 2;  % Studiare la variazione
+fp = 3;  % Studiare la variazione
 df = 1/Nbits;
 f = [-Ns/2:df:Ns/2-df];
 
 
-H = 1./(1+(j*2*pi*f./B));
+H = 1./(1+(j*2*pi*f/fp));
 
 %Convoluzione senza rumore e eye diagram
 
-% Y = X.*H.';
-% y = real(ifft(fftshift(Y)));
-% 
-% eyediagram(y(1:1000*Ns),2*Ns,2*Ns)
-% pause
+%  Y = X.*H.';
+%  y = real(ifft(fftshift(Y)));  
+%  eyediagram(y(1:1000*Ns),2*Ns,2*Ns)
+%  pause
 
 
 Vth = 0;
-topt = Ns;
+topt = 3;
 
 for ii = 1:8
   
@@ -73,7 +65,7 @@ for ii = 1:8
     
     xrx = real(ifft(fftshift(Xrx)));
      
-    y = xrx(2:topt:end);  
+    y = xrx(Ns-1:Ns:end);  
     
     for jj = 1:1:length(y)
         if y(jj)>Vth
@@ -89,12 +81,11 @@ for ii = 1:8
     
     BER(ii) = errors/Nbits;
     
-   
 end
 
 EbNolin = 10.^(EbNo./10);
 
-BERth = 1/2 * erfc((EbNolin/2).^0.5);  %BER Teorico per 2-PAM con ILPF
+BERth = 1/2 * erfc(((EbNolin/2).^0.5)*(2/(fp)).^0.5*(1-exp(-fp)));  %BER Teorico per 2-PAM con ILPF
 
 semilogy(EbNo,BERth,'r-');
 hold on
