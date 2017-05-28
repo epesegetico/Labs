@@ -1,3 +1,12 @@
+%MANCANO PEZZI RIGUARDANTI:
+% * SER E BER Teorici,
+% * BER effettivo (differenza tra bit ricevuti e bit trasmessi)
+% * Chiedere per quanto riguarda il rumore separato tra i due canali
+
+
+
+
+
 %NRZ passband digital transmission system with different modulations
 %Better create a modular program
 
@@ -15,7 +24,6 @@
 %Integral becomes a sum -> always a complex number, decision generally on
 %the Voronoi regions but it's easier by using distance from the signals
 
-clc
 clear all
 close all
 
@@ -30,7 +38,7 @@ N = Ns*Nbits/nbit;
 
 R = randi([0 1],[Nbits 1]);
 
-ak = zeros(length(R)/2,1);
+ak = zeros(length(R)/nbit,1);
 
 jj = 1;
 
@@ -38,7 +46,7 @@ jj = 1;
 
 S = [1+j -1+j -1-j 1-j];
 
-for ii = 1:2:length(R)
+for ii = 1:nbit:(length(R)+1-nbit)  %OK
     if (R(ii) == 0 && R(ii+1) == 0);
         ak(jj) = S(1);
        
@@ -53,14 +61,19 @@ for ii = 1:2:length(R)
         
     end
     jj = jj+1;
-end
+end  
 
 x = rectpulse(ak,Ns);
 Ps = mean(abs(x.^2));
 
+for ii = 1:length(ak)
+    Es(ii) = sum(abs(ak(ii).^2));
+end
 %AWGN
 
-EbNo = linspace(1,8,8);
+
+EbNo = linspace(2,12,8);
+EbNolin = 10.^(EbNo./10);
 
 sigma = (Ps*Ns/2)*10.^(-EbNo./10);
 
@@ -73,13 +86,17 @@ yrx = zeros(length(ak),1);
 val = yrx;
 pos = val;
 D = zeros(length(ak),4);
+SER = zeros(length(EbNo),1);
 
-for ii = 1:8
-    y = (real(x)+noise1(:,ii)) + j*(imag(x)+noise2(:,ii));
+for ii = 1:length(EbNo)
+    
+    y = (real(x)+noise1(:,ii)/2) + j*(imag(x)+noise2(:,ii)/2);
+   
     kk = 1;
+    
     for jj = 1:Ns:(length(y)-Ns)
         
-        yrx(kk) = sum(y(jj:(jj+Ns)));
+        yrx(kk) = sum(y(jj:(jj+Ns)));  %CONTROLLARE GLI INDICI
         kk = kk+1;
     end
     
@@ -89,12 +106,19 @@ for ii = 1:8
          
      end
   
-     sout = S(pos').';
+     sout = S(pos).';
    
      errors = sout-ak;
      
-     sum(errors ~= 0)
+     tot = sum(errors ~= 0);
+     
+     SER(ii) = tot/(length(ak));
 end
 
+SERth = (M-1)/2.*erfc((EbNolin).^0.5);
 
+semilogy(EbNo,SERth,'r-');
+hold on
+grid on
+semilogy(EbNo,SER,'bo');
                
