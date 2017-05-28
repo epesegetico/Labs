@@ -14,6 +14,7 @@ ak = zeros(Nbits,1);
 
 
 %Mapping dei valori
+
 ak = 2*Rin-1;
 
 x = rectpulse(ak,Ns);
@@ -24,7 +25,7 @@ X = fftshift(fft(x));
 %AWGN 
 
 
-EbNo = linspace(1,8,8);
+EbNo = linspace(2,12,8);
 
 sigma = (Ps*Ns/2)*10.^(-EbNo./10);
 
@@ -42,7 +43,7 @@ R = stdev.*randn(N,1);
 
 df = 1/Nbits;
 
-B = 1;  %Scegliere valore
+B = 0.7;  %Scegliere valore
 f = [-Ns/2:df:Ns/2-df]';
 H = abs(f)<B;
 
@@ -54,13 +55,14 @@ Y = X.*H;
 y = real(ifft(fftshift((Y))));
 eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
 
-%pause
+%paus
 
 topt = 2;
 Vth = 0;
 
-for ii = 1:8
+for ii = 1:length(EbNo)
   
+    %Add noise to the signal
     
     xtx = x+R(:,ii);
    
@@ -70,11 +72,14 @@ for ii = 1:8
     %eyediagram(xrx(1:1000*Ns),2*Ns,2*Ns);
     Xrx = Xtx.*H;
     
+    
     xrx = real(ifft(fftshift(Xrx)));
         
     
     
     y = xrx(topt:Ns:end);  
+    
+    %Decision Treshold
     
     for jj = 1:1:length(y)
         if y(jj)>Vth
@@ -100,6 +105,10 @@ BERth = 1/2 * erfc((EbNolin/2).^0.5);  %BER Teorico per 2-PAM con ILPF
 
 semilogy(EbNo,BERth,'r-');
 hold on
+grid on
+xlabel('Eb/No [dB]');
+ylabel('SNR');
+title('2-PAM Modulation with Ideal Low Pass Filter');
 semilogy(EbNo,BER,'b*');
 
 

@@ -128,6 +128,11 @@ BERth = 1/2 * erfc(EbNolin.^0.5);  %BER Teorico per 2-PAM
 
 semilogy(EbNo,BERth,'r-');
 hold on
+grid on
+xlabel('Eb/No [dB]');
+ylabel('SNR');
+title('2-PAM Modulation with Matched Filter');
+
 semilogy(EbNo,BER,'b*');
 
 
