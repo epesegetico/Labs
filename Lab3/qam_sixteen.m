@@ -1,13 +1,13 @@
-%16QAM
-
-clear all
+%16QAM - FUNZIONA SE Ps è la potenza della costellazione
 close all
+clear all
+
 
 M = 16;
 nbit = log2(M);
 
 
-Ns = 8;
+Ns = 4;
 Nbits = 1e6;
 N = Ns*Nbits/nbit;
 
@@ -17,10 +17,9 @@ R = randi([0 1],[Nbits 1]);
 
 %Mapping used in the slides - Gray
 
-S = [ -3+3*j -1+3*j 1+3*j 3+3j  -3+j -1+j   1+j   3+j -3-j -1-j   1-j   3-j -3-3*j -1-3*j 1-3*j -3-3*j].';
+S = [ -3+3*j -1+3*j 1+3*j 3+3j  -3+j -1+j   1+j   3+j -3-j -1-j   1-j   3-j -3-3*j -1-3*j 1-3*j 3-3*j];
 
 ak = zeros(length(R)/nbit,1);
-
 jj = 1;
 
 for ii = 1:nbit:(length(R)+1-nbit)
@@ -73,6 +72,7 @@ for ii = 1:nbit:(length(R)+1-nbit)
         ak(jj) = S(16);
     
     end
+    
     jj = jj+1;
     
 end
@@ -81,65 +81,77 @@ end
 
 x = rectpulse(ak,Ns);
 
-Ps = mean(abs(x.^2));  %Perché diverso dal calcolo?
+Ps = mean(abs(x).^2);  %potrebbe essere il problema
 
-
-for ii = 1:length(ak)
-    Es(ii) = (abs(ak(ii).^2));
-end
-Es = Es';
 %AWGN
+EbNo = linspace(2,12,8);
+EbNolin = 10.^(EbNo./10);
 
-EbNo = linspace(1,8,8);
+sigma = (Ps*Ns*nbit)./(2*EbNolin); 
 
-sigma = (Ps*Ns/2)*10.^(-EbNo./10); 
+stdev =  1/2 * sigma.^(1/2);
 
-stdev = sigma.^(1/2);
-
-noise1 = stdev.*randn(N,1);
-noise2 = stdev.*randn(N,1);
 
 
 %Receiver
 
 yrx = zeros(length(ak),1);  %Signal received
 
-val = zeros(length(ak),1);
-pos = zeros(length(ak),1);
-
 SER = zeros(length(EbNo),1);
+
 D = zeros(length(ak),M); %Vector of distances
 
-for ii = 1:8
+for ii = 1:length(EbNo)
+    noise1 = 1/2 *stdev(ii)*randn(N,1);
     
-    y = (real(x)+noise1(:,ii)/2) + j*(imag(x)+noise2(:,ii)/2);
+    noise2 = 1/2 *stdev(ii)*randn(N,1);
     
-    kk = 1;
+    y = (real(x)+noise1) + j*(imag(x)+noise2);
+   
+    %y = x;
     
-    for jj = 1:Ns:(length(y)-Ns)
+    kk = 0;
+    
+    for jj = 0:Ns:(length(y)-Ns) 
         
-        yrx(kk) = 1./sqrt(Es(kk)).*sum(y(jj:(jj+Ns))); 
         kk = kk+1;
+        
+        yrx(kk) = 1/Ns * sum(y((jj+1):(jj+Ns)));  
+       
     end
     
-     for jj = 1:length(S)
-         D(:,jj) = distance(yrx,S(jj));
-         [val,pos] = min(D,[],2); 
- 
+    for ind = 1:length(S)
+         D(:,ind) = distance(yrx,S(ind));
+         [~,pos] = min(D,[],2); 
+         
      end
   
-     sout = S(pos');
+     sout = S(pos).';
    
-     errors = sout-ak;
+     symbolErrors = sout-ak;
      
-     tot = sum(errors ~= 0)
-   
-     SER(ii) = tot/length(ak);
+     tot = sum(abs(symbolErrors) ~= 0);
+     
+     
+     SER(ii) = tot/(length(ak));   %SER per ogni EbNo è dato dal rapporto tra il totale degli errori e il numero di simboli inviati
 end
 
-EbNolin = 10.^(EbNo./10);
-SERth = (1-1/sqrt(M))*erfc(((3*nbit)/(2*M-2)).^0.5 .* EbNolin.^0.5);
+
+
+p = (1-1/sqrt(M))*erfc(((3*nbit.*EbNolin)./(2*M-2)).^0.5); 
+
+SERth = 2.*p - p.^2;
+
+SERQPSK = erfc((EbNolin).^0.5) - 1/4 * (erfc(EbNolin.^0.5).^2);
+
+
 semilogy(EbNo,SERth,'r-');
 hold on
+grid on
 semilogy(EbNo,SER,'b*');
+semilogy(EbNo,SERQPSK,'--');
+xlabel('Eb/No [dB]');
+ylabel('Symbol Error Rate');
+legend('16-QAM','16-QAM simulated','QPSK');
+
 

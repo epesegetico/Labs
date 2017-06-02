@@ -21,7 +21,7 @@
 
 %RECEIVER
 %General case: as seen in Digital Transmission class (signal spaces makes the work easier)
-%Integral becomes a sum -> always a complex number, decision generally on
+% %Integral becomes a sum -> always a complex number, decision generally on
 %the Voronoi regions but it's easier by using distance from the signals
 
 clear all
@@ -30,7 +30,7 @@ close all
 M = 4;
 nbit = log2(M);
 
-Ns = 4;
+Ns = 8;
 Nbits = 1e6;
 N = Ns*Nbits/nbit;
 
@@ -44,7 +44,7 @@ jj = 1;
 
 %Mapping
 
-S = [1+j -1+j -1-j 1-j];
+S = [1+1i -1+1i -1-1i 1-1i];
 
 for ii = 1:nbit:(length(R)+1-nbit)  %OK
     if (R(ii) == 0 && R(ii+1) == 0);
@@ -56,7 +56,7 @@ for ii = 1:nbit:(length(R)+1-nbit)  %OK
     elseif (R(ii) == 1 && R(ii+1) == 1);
         ak(jj) = S(3);
         
-    else  (R(ii) == 0 && R(ii+1) == 1);
+    else 
         ak(jj) = S(4);
         
     end
@@ -64,61 +64,73 @@ for ii = 1:nbit:(length(R)+1-nbit)  %OK
 end  
 
 x = rectpulse(ak,Ns);
-Ps = mean(abs(x.^2));
+Ps = mean(abs(S).^2); 
 
-for ii = 1:length(ak)
-    Es(ii) = sum(abs(ak(ii).^2));
-end
+
 %AWGN
 
 
-EbNo = linspace(2,12,8);
+EbNo = linspace(1,8,8);
 EbNolin = 10.^(EbNo./10);
 
-sigma = (Ps*Ns/2)*10.^(-EbNo./10);
+sigma = (Ps*Ns*nbit)./(2*EbNolin); 
 
 stdev = sigma.^(1/2);
 
-noise1 = stdev.*randn(N,1);
-noise2 = stdev.*randn(N,1);
+
 
 yrx = zeros(length(ak),1);
 val = yrx;
 pos = val;
-D = zeros(length(ak),4);
+
+D = zeros(length(ak),M);
 SER = zeros(length(EbNo),1);
 
 for ii = 1:length(EbNo)
-    
-    y = (real(x)+noise1(:,ii)/2) + j*(imag(x)+noise2(:,ii)/2);
+    noise1 = stdev(ii)*randn(N,1);
+
+    noise2 = stdev(ii)*randn(N,1);
+    y = (real(x)+noise1/2) + 1i*(imag(x)+noise2/2); %RISULTA COINCIDENTE CON LA TEORIA se il rumore è la metà per ogni modulazione
    
-    kk = 1;
+    %y = x;
     
-    for jj = 1:Ns:(length(y)-Ns)
+    kk = 0;
+    
+    for jj = 0:Ns:(length(y)-4)
         
-        yrx(kk) = sum(y(jj:(jj+Ns)));  %CONTROLLARE GLI INDICI
         kk = kk+1;
+        
+        yrx(kk) = 1/Ns * sum(y(jj+1:(jj+Ns)));  %CONTROLLARE GLI INDICI - MANCA 1/sqrt(es)
+       
     end
     
-     for jj = 1:length(S)
-         D(:,jj) = distance(yrx,S(jj));
-         [val,pos] = min(D,[],2); 
+    for ind = 1:length(S)
+         D(:,ind) = distance(yrx,S(ind));
+         [~,pos] = min(D,[],2); 
          
      end
   
      sout = S(pos).';
    
-     errors = sout-ak;
+     symbolErrors = sout-ak;
      
-     tot = sum(errors ~= 0);
+     tot = sum(abs(symbolErrors) ~= 0);
      
-     SER(ii) = tot/(length(ak));
+     
+     SER(ii) = tot/(length(ak));   %SER per ogni EbNo è dato dal rapporto tra il totale degli errori e il numero di simboli inviati
 end
 
-SERth = (M-1)/2.*erfc((EbNolin).^0.5);
+SERth = erfc((EbNolin).^0.5) - 1/4 * (erfc(EbNolin.^0.5).^2);  %SER teorico per qpsk (4-psk)
+
+BERth = SERth/nbit;
 
 semilogy(EbNo,SERth,'r-');
 hold on
 grid on
-semilogy(EbNo,SER,'bo');
-               
+semilogy(EbNo,SER,'b*');
+title('QPSK Modulation');
+xlabel('Eb/No [dB]');
+ylabel('Symbol Error Rate');
+legend('QPSK','QPSK Simulated');
+
+%MANCA IL BER
