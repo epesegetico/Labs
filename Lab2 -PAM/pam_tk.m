@@ -3,7 +3,7 @@
 close all
 clear all
 
-Ns = 12;
+Ns = 8;
 Nbits = 1e6;  
 N = Ns*Nbits;
 
@@ -19,21 +19,18 @@ Ps = mean(x.^2);
 
 
 
-k = 2;
+k = 1;
 
 h = [1:1:Ns].^k;
 
-
-
+h = h/sum(h);
 
 y = conv(x,h,'valid');
 
 eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
 
-pause
+figure
 
-
-A = (2*k+1)/((k+1)^2);
 
 %AWGN
 
@@ -77,8 +74,10 @@ for ii = 1:length(EbNo)
    
 end
 
-
+A = (2*k+1)/((k+1)^2);
 BERth = 1/2*erfc((A.*EbNolin).^0.5);
+BERthMF = 1/2*erfc((EbNolin).^0.5);
+
 semilogy(EbNo,BERth,'r-');
 hold on
 grid on
@@ -87,3 +86,6 @@ ylabel('SNR');
 title('2-PAM with h(t) = t^k , k = 2, 12 samples/bit');    
 
 semilogy(EbNo,BER,'b*');
+semilogy(EbNo,BERthMF,'b--');
+
+legend('t^k simulated','t^k filter','Matched filter');

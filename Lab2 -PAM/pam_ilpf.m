@@ -4,7 +4,7 @@ close all
 
 %2-PAM with ILPF
 
-Ns = 4;
+Ns = 8;
 Nbits = 1e6;  
 N = Ns*Nbits;
 
@@ -40,10 +40,9 @@ R = stdev.*randn(N,1);
 %Bsim = Ns*Rs -> Poiché normalizziamo,Bsim/Rs = Ns
 %df = Ns/(Ns*Nbit) = 1/Nbit
 
-
 df = 1/Nbits;
 
-B = 0.7;  %Scegliere valore
+B = 1;  %Scegliere valore
 f = [-Ns/2:df:Ns/2-df]';
 H = abs(f)<B;
 
@@ -55,9 +54,9 @@ Y = X.*H;
 y = real(ifft(fftshift((Y))));
 eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
 
-%paus
+pause
 
-topt = 2;
+topt = 6;
 Vth = 0;
 
 for ii = 1:length(EbNo)
@@ -101,14 +100,16 @@ end
 
 EbNolin = 10.^(EbNo./10);
 
-BERth = 1/2 * erfc((EbNolin/2).^0.5);  %BER Teorico per 2-PAM con ILPF
-
+BERth = 1/2 * erfc((EbNolin/2/B).^0.5);  %BER Teorico per 2-PAM con ILPF
+BERthMF = 1/2 * erfc((EbNolin).^0.5); 
 semilogy(EbNo,BERth,'r-');
 hold on
 grid on
 xlabel('Eb/No [dB]');
-ylabel('SNR');
+ylabel('BER');
 title('2-PAM Modulation with Ideal Low Pass Filter');
 semilogy(EbNo,BER,'b*');
+semilogy(EbNo,BERthMF,'b--');
+legend('ILPF theorical','ILPF simulation','Matched filter','Location','southwest');
 
 

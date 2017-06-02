@@ -2,7 +2,7 @@
 clear all
 close all
 
-Ns = 4;
+Ns = 8;
 Nbits = 1e6;  
 N = Ns*Nbits;
 
@@ -22,7 +22,7 @@ X = fftshift(fft(x));
 %AWGN
 
 
-EbNo = linspace(1,8,8);
+EbNo = linspace(2,12,8);
 
 sigma = (Ps*Ns/2)*10.^(-EbNo./10);
 
@@ -34,7 +34,7 @@ R = stdev.*randn(N,1);
 
 %CREAZIONE DEL FILTRO 
 
-fp = 3;  % Studiare la variazione
+fp = 2.5;  % Studiare la variazione
 df = 1/Nbits;
 f = [-Ns/2:df:Ns/2-df];
 
@@ -43,14 +43,14 @@ H = 1./(1+(j*2*pi*f/fp));
 
 %Convoluzione senza rumore e eye diagram
 
-%  Y = X.*H.';
-%  y = real(ifft(fftshift(Y)));  
-%  eyediagram(y(1:1000*Ns),2*Ns,2*Ns)
-%  pause
+  Y = X.*H.';
+  y = real(ifft(fftshift(Y)));  
+  eyediagram(y(1:1000*Ns),2*Ns,2*Ns)
+  pause
 
 
 Vth = 0;
-topt = 3;
+topt = 7+1;
 
 for ii = 1:8
   
@@ -65,7 +65,7 @@ for ii = 1:8
     
     xrx = real(ifft(fftshift(Xrx)));
      
-    y = xrx(Ns-1:Ns:end);  
+    y = xrx(topt:Ns:end);  
     
     for jj = 1:1:length(y)
         if y(jj)>Vth
@@ -85,9 +85,17 @@ end
 
 EbNolin = 10.^(EbNo./10);
 
-BERth = 1/2 * erfc(((EbNolin/2).^0.5)*(2/(fp)).^0.5*(1-exp(-fp)));  %BER Teorico per 2-PAM con ILPF
+BERth = 1/2 * erfc((EbNolin.^0.5) * (2/fp).^0.5 * (1-exp(-fp)));  %BER Teorico per 2-PAM con RC
+BERthMF = 1/2 * erfc((EbNolin).^0.5); 
+
+figure
 
 semilogy(EbNo,BERth,'r-');
 hold on
+grid on
 semilogy(EbNo,BER,'b*');
-
+hold on
+semilogy(EbNo,BERthMF,'b--');
+xlabel('Eb/No [dB]');
+ylabel('BER');
+legend('RC filter','Simulated RC filter','Matched filter');

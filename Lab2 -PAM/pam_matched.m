@@ -89,7 +89,7 @@ h = 1/Ns*rectpulse(1,Ns);
 
 xnoiseless = conv(x,h,'valid');
 eyediagram(xnoiseless(1:1000*Ns),2*Ns,2*Ns)
-%pause 
+pause 
 
 Vth = 0;
 topt = 1;
@@ -129,11 +129,12 @@ BERth = 1/2 * erfc(EbNolin.^0.5);  %BER Teorico per 2-PAM
 semilogy(EbNo,BERth,'r-');
 hold on
 grid on
+semilogy(EbNo,BER,'b*');
 xlabel('Eb/No [dB]');
 ylabel('SNR');
 title('2-PAM Modulation with Matched Filter');
+legend('Theorical Curve','Simulation');
 
-semilogy(EbNo,BER,'b*');
 
 
 %Si osserva che col diminuire di Nbits il comportamento si discosta molto
