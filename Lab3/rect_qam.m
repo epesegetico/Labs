@@ -1,7 +1,7 @@
 clear all
 close all
 
-% Rectangular 8-QAM
+% Rectangular 8-QAM - MANCA DEMODULATORE E BER
 
 M = 8;
 nbit = log2(M);

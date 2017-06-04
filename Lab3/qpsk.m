@@ -13,7 +13,7 @@
 %QPSK
 %nbits form a symbol 
 %for labelling try gray coding
-%ak must be complex in order to use the IQ components of the signal 
+%symbolsIn must be complex in order to use the IQ components of the signal 
 %Consider the complex envelope of the signal
 
 %AWGN
@@ -36,9 +36,9 @@ N = Ns*Nbits/nbit;
 
 %Transmitter
 
-R = randi([0 1],[Nbits 1]);
+bitsIn = randi([0 1],[Nbits 1]);
 
-ak = zeros(length(R)/nbit,1);
+symbolsIn = zeros(length(bitsIn)/nbit,1);
 
 jj = 1;
 
@@ -46,24 +46,25 @@ jj = 1;
 
 S = [1+1i -1+1i -1-1i 1-1i];
 
-for ii = 1:nbit:(length(R)+1-nbit)  %OK
-    if (R(ii) == 0 && R(ii+1) == 0);
-        ak(jj) = S(1);
+
+for ii = 1:nbit:(length(bitsIn)+1-nbit)  %OK
+    if (bitsIn(ii) == 0 && bitsIn(ii+1) == 0);
+        symbolsIn(jj) = S(1);
        
-    elseif (R(ii) == 1 && R(ii+1) == 0);
-        ak(jj) = S(2);
+    elseif (bitsIn(ii) == 1 && bitsIn(ii+1) == 0);
+        symbolsIn(jj) = S(2);
        
-    elseif (R(ii) == 1 && R(ii+1) == 1);
-        ak(jj) = S(3);
+    elseif (bitsIn(ii) == 1 && bitsIn(ii+1) == 1);
+        symbolsIn(jj) = S(3);
         
     else 
-        ak(jj) = S(4);
+        symbolsIn(jj) = S(4);
         
     end
     jj = jj+1;
 end  
 
-x = rectpulse(ak,Ns);
+x = rectpulse(symbolsIn,Ns);
 Ps = mean(abs(S).^2); 
 
 
@@ -79,12 +80,18 @@ stdev = sigma.^(1/2);
 
 
 
-yrx = zeros(length(ak),1);
+yrx = zeros(length(symbolsIn),1);
 val = yrx;
 pos = val;
 
-D = zeros(length(ak),M);
+D = zeros(length(symbolsIn),M);
+
 SER = zeros(length(EbNo),1);
+BER = SER;
+
+bitsOut = zeros(length(bitsIn),1);
+
+
 
 for ii = 1:length(EbNo)
     noise1 = stdev(ii)*randn(N,1);
@@ -110,14 +117,49 @@ for ii = 1:length(EbNo)
          
      end
   
-     sout = S(pos).';
+     symbolsOut = S(pos).';
    
-     symbolErrors = sout-ak;
+     symbolErrors = symbolsOut-symbolsIn;
      
      tot = sum(abs(symbolErrors) ~= 0);
      
      
-     SER(ii) = tot/(length(ak));   %SER per ogni EbNo è dato dal rapporto tra il totale degli errori e il numero di simboli inviati
+     SER(ii) = tot/(length(symbolsIn));   %SER per ogni EbNo è dato dal rapporto tra il totale degli errori e il numero di simboli inviati
+     
+     
+     ind2 = 1;
+     for ind1 = 1:length(symbolsOut)
+         if symbolsOut(ind1) == 1+1i
+             
+             bitsOut(ind2) = 0;
+             bitsOut(ind2+1) = 0;
+             
+         elseif symbolsOut(ind1) == -1+1i
+             
+             bitsOut(ind2) = 1;
+             bitsOut(ind2+1) = 0;
+             
+         elseif symbolsOut(ind1) == -1-1i
+             
+              bitsOut(ind2) = 1;
+              bitsOut(ind2+1) = 1;
+              
+         else
+             
+              bitsOut(ind2) = 0;
+              bitsOut(ind2+1) = 1;
+              
+         end
+         
+         ind2 = ind2+nbit;
+         
+     end
+     
+     
+     bitErrors = sum(abs(bitsOut-bitsIn) ~= 0)
+     
+     BER(ii) = bitErrors/length(bitsIn);
+     
 end
 
 SERth = erfc((EbNolin).^0.5) - 1/4 * (erfc(EbNolin.^0.5).^2);  %SER teorico per qpsk (4-psk)
@@ -132,5 +174,20 @@ title('QPSK Modulation');
 xlabel('Eb/No [dB]');
 ylabel('Symbol Error Rate');
 legend('QPSK','QPSK Simulated');
+
+figure
+
+BERth = SERth./nbit;
+
+semilogy(EbNo,BERth,'r-');
+hold on
+grid on
+semilogy(EbNo,BER,'b*');
+title('QPSK Modulation - Bit Error Rate');
+xlabel('Eb/No [dB]');
+ylabel('Bit Error Rate');
+legend('QPSK','QPSK Simulated');
+
+
 
 %MANCA IL BER
