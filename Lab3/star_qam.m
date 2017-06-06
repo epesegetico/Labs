@@ -57,7 +57,7 @@ EbNo = linspace(2,12,8);
 
 sigma = (Ps*Ns/2)*10.^(-EbNo./10); 
 
-stdev = 1/2 * sigma.^(1/2);
+stdev = sigma.^(1/2);
 
 
 
@@ -79,9 +79,9 @@ for ii = 1:length(EbNo)
 
     
     
-    y = (real(x)+noise1(:)) + j*(imag(x)+noise2(:));
+    %y = (real(x)+noise1(:)/2) + j*(imag(x)+noise2(:)/2);
     
-    %y = x;
+    y = x;
     
     kk = 1;
     
@@ -106,12 +106,12 @@ end
 
 EbNolin = 10.^(EbNo./10);
 
+upperSER = 3.5 * erfc(((3-sqrt(3))/2 * EbNolin).^0.5);
 
-p = (1-1/sqrt(M))*erfc(((3*nbit.*EbNolin)./(2*M-2)).^0.5); 
 
-SERth = 2.*p - p.^2;
-
-semilogy(EbNo,SERth,'r-');
+lowerSER = 1/8 * erfc(((3-sqrt(3))/2 * EbNolin).^0.5);
+semilogy(EbNo,upperSER,'r-');
 hold on
 grid on
+semilogy(EbNo,lowerSER,'b--');
 semilogy(EbNo,SER,'b*');

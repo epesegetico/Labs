@@ -187,7 +187,7 @@ title('QPSK Modulation - Bit Error Rate');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');
 legend('QPSK','QPSK Simulated');
+figure
 
-
-
-%MANCA IL BER
+cloudplot(real(yrx),imag(yrx),[],'true');
+title('QPSK scatter plot');

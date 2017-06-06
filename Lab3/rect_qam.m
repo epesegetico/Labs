@@ -52,14 +52,13 @@ Ps = mean(abs(S).^2);
 %AWGN
 
 EbNo = linspace(2,12,8);
+EbNolin = 10.^(EbNo./10);
 
-sigma = (Ps*Ns/2)*10.^(-EbNo./10); 
+sigma = (Ps*Ns*nbit)./(2*EbNolin);
 
-stdev = 1/2 * sigma.^(1/2);
+stdev =  1/2 * sigma.^(1/2);
 
 
-noise1 = stdev.*randn(length(x),1);
-noise2 = stdev.*randn(length(x),1);
 
 
 %Receiver
@@ -74,8 +73,12 @@ SER = zeros(length(EbNo),1);
 D = zeros(length(ak),M); %Vector of distances
 
 for ii = 1:length(EbNo)
+   noise1 = 1/2 *stdev(ii)*randn(N,1);
     
-    y = (real(x)+noise1(:,ii)) + j*(imag(x)+noise2(:,ii));
+    noise2 = 1/2 *stdev(ii)*randn(N,1);
+    
+
+    y = (real(x)+noise1) + j*(imag(x)+noise2);
     
     kk = 1;
     
@@ -104,8 +107,12 @@ p = (1-1/sqrt(M))*erfc(((3*nbit.*EbNolin)./(2*M-2)).^0.5);
 
 SERth = 2.*p - p.^2;
 
+SERth1 = 5/4 * erfc((0.5*EbNolin).^0.5) - 3/8 *erfc((0.5*EbNolin).^0.5).^2;
 
 semilogy(EbNo,SERth,'r-');
 hold on
 grid on
+semilogy(EbNo,SERth1,'b--');
+
 semilogy(EbNo,SER,'b*');
+

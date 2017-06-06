@@ -285,6 +285,7 @@ xlabel('Eb/No [dB]');
 ylabel('Symbol Error Rate');
 legend('16-QAM','16-QAM simulated','QPSK');
 
+
 figure
 
 BERth = SERth./nbit;
@@ -297,5 +298,14 @@ title('16-QAM Modulation - Bit Error Rate');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');
 legend('16-QAM','16-QAM Simulated');
+
+%Plot della costellazione
+
+figure
+
+cloudplot(real(yrx),imag(yrx),[],'true');
+
+
+
 
 
