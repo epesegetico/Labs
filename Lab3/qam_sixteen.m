@@ -273,22 +273,21 @@ p = (1-1/sqrt(M))*erfc(((3*nbit.*EbNolin)./(2*M-2)).^0.5);
 
 SERth = 2.*p - p.^2;
 
-SERQPSK = erfc((EbNolin).^0.5) - 1/4 * (erfc(EbNolin.^0.5).^2);
 
 
 semilogy(EbNo,SERth,'r-');
 hold on
 grid on
 semilogy(EbNo,SER,'b*');
-semilogy(EbNo,SERQPSK,'--');
+
 xlabel('Eb/No [dB]');
 ylabel('Symbol Error Rate');
-legend('16-QAM','16-QAM simulated','QPSK');
+legend('16-QAM','16-QAM simulated');
 
 
 figure
 
-BERth = SERth./nbit;
+BERth = 3/8 * erfc((2/5*EbNolin).^0.5);
 
 semilogy(EbNo,BERth,'r-');
 hold on
