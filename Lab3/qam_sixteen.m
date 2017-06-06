@@ -87,9 +87,9 @@ Ps = mean(abs(x).^2);  %potrebbe essere il problema
 EbNo = linspace(2,12,8);
 EbNolin = 10.^(EbNo./10);
 
-sigma = (Ps*Ns*nbit)./(2*EbNolin);
+sigma = (Ps*Ns)./(nbit*EbNolin);
 
-stdev =  1/2 * sigma.^(1/2);
+stdev =  1/sqrt(2) * sigma.^(1/2);
 
 
 
@@ -106,9 +106,9 @@ bitsOut = zeros(length(bitsIn),1);
 D = zeros(length(symbolsIn),M); %Vector of distances
 
 for ii = 1:length(EbNo)
-    noise1 = 1/2 *stdev(ii)*randn(N,1);
+    noise1 = stdev(ii)*randn(N,1);
     
-    noise2 = 1/2 *stdev(ii)*randn(N,1);
+    noise2 = stdev(ii)*randn(N,1);
     
     y = (real(x)+noise1) + j*(imag(x)+noise2);
     

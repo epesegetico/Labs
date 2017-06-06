@@ -74,9 +74,9 @@ Ps = mean(abs(S).^2);
 EbNo = linspace(1,8,8);
 EbNolin = 10.^(EbNo./10);
 
-sigma = (Ps*Ns*nbit)./(2*EbNolin); 
+sigma = (Ps*Ns)./(nbit*EbNolin); 
 
-stdev = sigma.^(1/2);
+stdev = 1/sqrt(2) * sigma.^(1/2);
 
 
 
@@ -97,7 +97,7 @@ for ii = 1:length(EbNo)
     noise1 = stdev(ii)*randn(N,1);
 
     noise2 = stdev(ii)*randn(N,1);
-    y = (real(x)+noise1/2) + 1i*(imag(x)+noise2/2); %RISULTA COINCIDENTE CON LA TEORIA se il rumore è la metà per ogni modulazione
+    y = (real(x)+noise1) + 1i*(imag(x)+noise2); %RISULTA COINCIDENTE CON LA TEORIA se il rumore è la metà per ogni modulazione
    
     %y = x;
     
