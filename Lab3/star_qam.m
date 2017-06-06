@@ -54,10 +54,14 @@ Ps = mean(abs(S).^2);
 %AWGN
 
 EbNo = linspace(2,12,8);
+EbNolin = 10.^(EbNo./10);
 
-sigma = (Ps*Ns/2)*10.^(-EbNo./10); 
+sigma = (Ps*Ns)./(nbit*EbNolin);
 
-stdev = sigma.^(1/2);
+stdev =  1/sqrt(2) * sigma.^(1/2);
+
+
+
 
 
 
@@ -79,9 +83,9 @@ for ii = 1:length(EbNo)
 
     
     
-    %y = (real(x)+noise1(:)/2) + j*(imag(x)+noise2(:)/2);
+    y = (real(x)+noise1(:)) + j*(imag(x)+noise2(:));
     
-    y = x;
+
     
     kk = 1;
     
@@ -115,3 +119,5 @@ hold on
 grid on
 semilogy(EbNo,lowerSER,'b--');
 semilogy(EbNo,SER,'b*');
+legend('Upper Bound','Lower Bound','Simulation');
+title('SER vs Eb/No - Star 8-QAM');

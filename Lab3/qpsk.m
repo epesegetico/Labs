@@ -65,7 +65,7 @@ for ii = 1:nbit:(length(bitsIn)+1-nbit)  %OK
 end  
 
 x = rectpulse(symbolsIn,Ns);
-Ps = mean(abs(S).^2); 
+Ps = mean(abs(x).^2); 
 
 
 %AWGN
@@ -103,7 +103,7 @@ for ii = 1:length(EbNo)
     
     kk = 0;
     
-    for jj = 0:Ns:(length(y)-4)
+    for jj = 0:Ns:(length(y)-Ns)
         
         kk = kk+1;
         
