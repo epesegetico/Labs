@@ -7,7 +7,7 @@ close all
 Ns = 8;
 Nbits = 1e6;  
 N = Ns*Nbits;
-
+nbit = 1;
 Rin = randi([0 1],[Nbits, 1]);
 
 ak = zeros(Nbits,1);
@@ -18,20 +18,19 @@ ak = zeros(Nbits,1);
 ak = 2*Rin-1;
 
 x = rectpulse(ak,Ns);
-Ps = mean(x.^2);
+Ps = mean(abs(x).^2);
 X = fftshift(fft(x));
 
 
 %AWGN 
 
+EbNo = linspace(1,8,8);
+EbNolin = 10.^(EbNo./10);
+sigma = (Ps*Ns)./(2*nbit*EbNolin); 
 
-EbNo = linspace(2,12,8);
-
-sigma = (Ps*Ns/2)*10.^(-EbNo./10);
 
 stdev = sigma.^(1/2);
 
-R = stdev.*randn(N,1);
 
 
 %CREAZIONE DEL FILTRO 
@@ -60,10 +59,10 @@ topt = 6;
 Vth = 0;
 
 for ii = 1:length(EbNo)
-  
-    %Add noise to the signal
     
-    xtx = x+R(:,ii);
+    noise = stdev(ii).*randn(N,1);
+    xtx = x+noise(:);
+   
    
     
     Xtx = fftshift(fft(xtx));
@@ -98,9 +97,7 @@ for ii = 1:length(EbNo)
 end
 
 
-EbNolin = 10.^(EbNo./10);
-
-BERth = 1/2 * erfc((EbNolin/2/B).^0.5);  %BER Teorico per 2-PAM con ILPF
+BERth = 1/2 * erfc((EbNolin/(2*B)).^0.5);  %BER Teorico per 2-PAM con ILPF
 BERthMF = 1/2 * erfc((EbNolin).^0.5); 
 semilogy(EbNo,BERth,'r-');
 hold on

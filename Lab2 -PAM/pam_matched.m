@@ -50,8 +50,13 @@
 
 %HOW MANY BITS SHOULD I SIMULATE? #errors = BER*#bits -> i should see the
 %errors,so 10-100 errors minimum
+
+
 close all
 clear all
+
+M = 2;
+nbit = log2(M);
 
 Ns = 8;
 Nbits = 1e6;  
@@ -67,18 +72,17 @@ ak = 2*Rin-1;
 
 x = rectpulse(ak,Ns);
 
-Ps = mean(x.^2);
+Ps = mean(abs(x).^2);
 
 % AWGN
 
 
 EbNo = linspace(1,8,8);
-
-sigma = (Ps*Ns/2)*10.^(-EbNo./10);
+EbNolin = 10.^(EbNo./10);
+sigma = (Ps*Ns)./(2*nbit*EbNolin); 
 
 stdev = sigma.^(1/2);
 
-R = stdev.*randn(N,1);
 
 %Filtro normalizzato
 
@@ -97,7 +101,8 @@ topt = 1;
 for ii = 1:length(EbNo)
     
     
-    xtx = x+R(:,ii);
+    noise = stdev(ii).*randn(N,1);
+    xtx = x+noise(:);
     xrx = conv(xtx,h,'valid');
     
     %eyediagram(xrx(1:1000*Ns),2*Ns,2*Ns);
@@ -122,7 +127,7 @@ for ii = 1:length(EbNo)
    
 end
 
-EbNolin = 10.^(EbNo./10);
+
 
 BERth = 1/2 * erfc(EbNolin.^0.5);  %BER Teorico per 2-PAM
 

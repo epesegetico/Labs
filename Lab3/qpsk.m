@@ -30,7 +30,7 @@ close all
 M = 4;
 nbit = log2(M);
 
-Ns = 8;
+Ns = 24;
 Nbits = 1e6;
 N = Ns*Nbits/nbit;
 
@@ -81,8 +81,7 @@ stdev = 1/sqrt(2) * sigma.^(1/2);
 
 
 yrx = zeros(length(symbolsIn),1);
-val = yrx;
-pos = val;
+
 
 D = zeros(length(symbolsIn),M);
 
@@ -129,17 +128,17 @@ for ii = 1:length(EbNo)
      
      ind2 = 1;
      for ind1 = 1:length(symbolsOut)
-         if symbolsOut(ind1) == 1+1i
+         if symbolsOut(ind1) == S(1)
              
              bitsOut(ind2) = 0;
              bitsOut(ind2+1) = 0;
              
-         elseif symbolsOut(ind1) == -1+1i
+         elseif symbolsOut(ind1) == S(2)
              
              bitsOut(ind2) = 1;
              bitsOut(ind2+1) = 0;
              
-         elseif symbolsOut(ind1) == -1-1i
+         elseif symbolsOut(ind1) == S(3)
              
               bitsOut(ind2) = 1;
               bitsOut(ind2+1) = 1;

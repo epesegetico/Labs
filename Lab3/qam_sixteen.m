@@ -110,9 +110,9 @@ for ii = 1:length(EbNo)
     
     noise2 = stdev(ii)*randn(N,1);
     
-    y = (real(x)+noise1) + j*(imag(x)+noise2);
+    %y = (real(x)+noise1) + j*(imag(x)+noise2);
     
-    %y = x;
+    y = x;
     
     kk = 0;
     
@@ -134,7 +134,7 @@ for ii = 1:length(EbNo)
     
     symbolErrors = symbolsOut-symbolsIn;
     
-    tot = sum(abs(symbolErrors) ~= 0);
+    tot = sum(abs(symbolErrors) ~= 0)
     
     
     SER(ii) = tot/(length(symbolsIn));   %SER per ogni EbNo è dato dal rapporto tra il totale degli errori e il numero di simboli inviati

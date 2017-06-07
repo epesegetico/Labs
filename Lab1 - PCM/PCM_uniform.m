@@ -30,7 +30,7 @@
 
 
 close all
-clear
+clear all
 
 
 
@@ -91,7 +91,7 @@ for n=4:2:8
     
     SNRth = 10*log10((M^2)./(1+4*(M^2-1).*Pbth));
     semilogx(Pbth,SNRth,'r-');
-    
+   
     
      
 end
