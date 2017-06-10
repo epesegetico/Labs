@@ -51,6 +51,10 @@ xtx_r = xtx_r .* exp(1i*2*pi*f0*t);
 xtx = xtx_cut+xtx_l+xtx_r;
 %xtx = xtx_cut;
 
+Bartlett(xtx,1000,Ns);
+cleanfigure();
+matlab2tikz('fdm_qam_PSD.tex');
+
 Ps = mean(abs(xtx_cut).^2); %potenza del segnale
 
 
@@ -257,33 +261,28 @@ SERth = 2.*p - p.^2;
 semilogy(EbNo_dB,SERth,'r-');
 hold on
 grid on
-semilogy(EbNo_dB,SER,'b*');
+semilogy(EbNo_dB,SER,'r*');
 
-xlabel('Eb/No [dB]');
-ylabel('Symbol Error Rate');
-legend('16-QAM','16-QAM simulated');
-
-figure
 BERth = 3/8 * erfc((2/5*EbNo).^0.5);
 
-semilogy(EbNo_dB,BERth,'r-');
+semilogy(EbNo_dB,BERth,'b-');
 hold on
 grid on
-semilogy(EbNo_dB,BER,'b*');
+semilogy(EbNo_dB,BER,'bo');
 title('FDM 16-QAM Modulation');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');
-legend('BER','BER Simulated');
+legend('SER','SER Simulated','BER','BER Simulated');
 
 %Plot della costellazione
 
-cleanfigure();
-matlab2tikz('fdm_qam_BER.tex');
+% cleanfigure();
+% matlab2tikz('fdm_qam_BER.tex');
 
 figure
 
 cloudplot(real(yrx),imag(yrx),[],'true');
 
-
-cleanfigure();
-matlab2tikz('fdm_qam_cloud.tex');
+% 
+% cleanfigure();
+% matlab2tikz('fdm_qam_cloud.tex');

@@ -37,7 +37,6 @@ xtx_cut = rectpulse(symbolsIn,Ns);
 xtx_l = rectpulse(symbols_l,Ns);
 xtx_r = rectpulse(symbols_r,Ns);
 
-Bartlett(xtx_cut,1000,Ns);
 t = [0:1:length(xtx_cut)-1]*(1/Ns);
 
 
@@ -49,6 +48,9 @@ xtx_r = xtx_r .* exp(1i*2*pi*f0*t);
 xtx = xtx_cut+xtx_l+xtx_r;
 
 Bartlett(xtx,1000,Ns);
+
+cleanfigure();
+matlab2tikz('fdm_qpsk_PSD.tex');
 
 Ps = mean(abs(xtx_cut).^2);
 
@@ -154,32 +156,28 @@ BERth = SERth/nbit;
 semilogy(EbNo_dB,SERth,'r-');
 hold on
 grid on
-semilogy(EbNo_dB,SER,'b*');
-title('QPSK Modulation');
-xlabel('Eb/No [dB]');
-ylabel('Symbol Error Rate');
-legend('QPSK','QPSK Simulated');
+semilogy(EbNo_dB,SER,'r*');
 
-figure
+
 
 BERth = SERth./nbit;
 
-semilogy(EbNo_dB,BERth,'r-');
+semilogy(EbNo_dB,BERth,'b-');
 hold on
 grid on
-semilogy(EbNo_dB,BER,'b*');
+semilogy(EbNo_dB,BER,'bo');
 title('FDM QPSK Modulation');
 xlabel('Eb/No [dB]');
-ylabel('Bit Error Rate');
-legend('BER','BER Simulated');
 
-cleanfigure();
-matlab2tikz('fdm_qpsk_BER.tex');
+legend('SER','SER Simulated','BER','BER Simulated');
+
+% cleanfigure();
+% matlab2tikz('fdm_qpsk_BER.tex');
 figure
 
 cloudplot(real(yrx),imag(yrx),[],'true');
 title('FDM - QPSK scatter plot');
-
-
-cleanfigure();
-matlab2tikz('fdm_qpsk_cloud.tex');
+% 
+% 
+% cleanfigure();
+% matlab2tikz('fdm_qpsk_cloud.tex');
