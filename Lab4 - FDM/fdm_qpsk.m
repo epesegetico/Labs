@@ -168,11 +168,18 @@ semilogy(EbNo_dB,BERth,'r-');
 hold on
 grid on
 semilogy(EbNo_dB,BER,'b*');
-title('QPSK Modulation - Bit Error Rate');
+title('FDM QPSK Modulation');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');
-legend('QPSK','QPSK Simulated');
+legend('BER','BER Simulated');
+
+cleanfigure();
+matlab2tikz('fdm_qpsk_BER.tex');
 figure
 
 cloudplot(real(yrx),imag(yrx),[],'true');
-title('QPSK scatter plot');
+title('FDM - QPSK scatter plot');
+
+
+cleanfigure();
+matlab2tikz('fdm_qpsk_cloud.tex');

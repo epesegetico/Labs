@@ -5,7 +5,7 @@ clear all
 
 Nbit = 1e6;
 Ns = 12;
-f0 = 1;
+f0 = 1.5;
 
 %QPSK
 
@@ -270,15 +270,20 @@ semilogy(EbNo_dB,BERth,'r-');
 hold on
 grid on
 semilogy(EbNo_dB,BER,'b*');
-title('16-QAM Modulation - Bit Error Rate');
+title('FDM 16-QAM Modulation');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');
-legend('16-QAM','16-QAM Simulated');
+legend('BER','BER Simulated');
 
 %Plot della costellazione
+
+cleanfigure();
+matlab2tikz('fdm_qam_BER.tex');
 
 figure
 
 cloudplot(real(yrx),imag(yrx),[],'true');
 
 
+cleanfigure();
+matlab2tikz('fdm_qam_cloud.tex');
