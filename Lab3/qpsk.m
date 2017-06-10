@@ -30,7 +30,7 @@ close all
 M = 4;
 nbit = log2(M);
 
-Ns = 24;
+Ns = 8;
 Nbits = 1e6;
 N = Ns*Nbits/nbit;
 
@@ -71,7 +71,7 @@ Ps = mean(abs(x).^2);
 %AWGN
 
 
-EbNo = linspace(1,8,8);
+EbNo = [2:2:12];
 EbNolin = 10.^(EbNo./10);
 
 sigma = (Ps*Ns)./(nbit*EbNolin); 
@@ -171,21 +171,17 @@ grid on
 semilogy(EbNo,SER,'b*');
 title('QPSK Modulation');
 xlabel('Eb/No [dB]');
-ylabel('Symbol Error Rate');
-legend('QPSK','QPSK Simulated');
-
-figure
 
 BERth = SERth./nbit;
 
-semilogy(EbNo,BERth,'r-');
+semilogy(EbNo,BERth,'g-');
 hold on
 grid on
-semilogy(EbNo,BER,'b*');
-title('QPSK Modulation - Bit Error Rate');
+semilogy(EbNo,BER,'bo');
+title('QPSK Modulation');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');
-legend('QPSK','QPSK Simulated');
+legend('SER','SER Simulated','BER','BER Simulated');
 figure
 
 cloudplot(real(yrx),imag(yrx),[],'true');

@@ -9,8 +9,8 @@ M = 8;
 nbit = log2(M);
 
 
-Ns = 4;
-Nbits = 9e6;
+Ns = 8;
+Nbits = 3e6;
 N = Ns*Nbits;
 
 bitsIn = randi([0 1],[Nbits 1]);
@@ -53,7 +53,7 @@ Ps = mean(abs(x).^2);
 
 %AWGN
 
-EbNo = linspace(2,12,8);
+EbNo = [2:2:12];
 EbNolin = 10.^(EbNo./10);
 
 sigma = (Ps*Ns)./(nbit*EbNolin);
@@ -104,7 +104,7 @@ for ii = 1:length(EbNo)
    
      errors = symbolsOut-ak;
      
-     tot = sum(abs(errors ~= 0))
+     tot = sum(abs(errors ~= 0));
    
      SER(ii) = tot/(length(ak));
 ind2 = 1;
@@ -168,12 +168,12 @@ ind2 = 1;
             
         end
     
-    bitErrors = sum(abs(bitsOut-bitsIn) ~= 0)
+    bitErrors = sum(abs(bitsOut-bitsIn) ~= 0);
     
     BER(ii) = bitErrors/length(bitsIn);
 end
 
-EbNolin = 10.^(EbNo./10);
+
 
 upperSER = 3.5 * erfc(((3-sqrt(3))/2 * EbNolin).^0.5);
 lowerSER = 1/8 * erfc(((3-sqrt(3))/2 * EbNolin).^0.5);
@@ -181,26 +181,29 @@ lowerSER = 1/8 * erfc(((3-sqrt(3))/2 * EbNolin).^0.5);
 semilogy(EbNo,upperSER,'r-');
 hold on
 grid on
-semilogy(EbNo,lowerSER,'b--');
+semilogy(EbNo,lowerSER,'r-');
 semilogy(EbNo,SER,'b*');
 legend('Upper Bound','Lower Bound','Simulation');
-title('SER vs Eb/No - Star 8-QAM');
+
 
 %Plot del BER
-figure
 
-semilogy(EbNo,SER,'r-');
+semilogy(EbNo,SER,'g-');
 hold on
 grid on
-semilogy(EbNo,SER/log2(M),'b--');
-semilogy(EbNo,BER,'b*');
-title('Star 8-QAM Modulation - Bit Error Rate');
+semilogy(EbNo,SER/log2(M),'g-');
+semilogy(EbNo,BER,'bo');
+title('Star 8-QAM Modulation');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');
-legend('8-QAM star','8-QAM star Simulated');
-
+legend('SER Upper Bound','SER Lower Bound','SER Simulated','BER Upper Bound','BER Lower Bound','BER Simulated');
+cleanfigure();
+matlab2tikz('star_BER.tex');
 %Plot della costellazione
 
 figure
 
 cloudplot(real(yrx),imag(yrx),[],'true');
+
+cleanfigure();
+matlab2tikz('star_cloud.tex');

@@ -7,7 +7,7 @@ M = 16;
 nbit = log2(M);
 
 
-Ns = 4;
+Ns = 8;
 Nbits = 1e6;
 N = Ns*Nbits/nbit;
 
@@ -84,7 +84,7 @@ x = rectpulse(symbolsIn,Ns);
 Ps = mean(abs(x).^2);  %potrebbe essere il problema
 
 %AWGN
-EbNo = linspace(2,12,8);
+EbNo = [2:2:12]
 EbNolin = 10.^(EbNo./10);
 
 sigma = (Ps*Ns)./(nbit*EbNolin);
@@ -110,9 +110,9 @@ for ii = 1:length(EbNo)
     
     noise2 = stdev(ii)*randn(N,1);
     
-    %y = (real(x)+noise1) + j*(imag(x)+noise2);
+    y = (real(x)+noise1) + j*(imag(x)+noise2);
     
-    y = x;
+    %y = x;
     
     kk = 0;
     
@@ -134,7 +134,7 @@ for ii = 1:length(EbNo)
     
     symbolErrors = symbolsOut-symbolsIn;
     
-    tot = sum(abs(symbolErrors) ~= 0)
+    tot = sum(abs(symbolErrors) ~= 0);
     
     
     SER(ii) = tot/(length(symbolsIn));   %SER per ogni EbNo è dato dal rapporto tra il totale degli errori e il numero di simboli inviati
@@ -261,7 +261,7 @@ for ii = 1:length(EbNo)
         end
     
     
-    bitErrors = sum(abs(bitsOut-bitsIn) ~= 0)
+    bitErrors = sum(abs(bitsOut-bitsIn) ~= 0);
     
     BER(ii) = bitErrors/length(bitsIn);
     
@@ -281,30 +281,29 @@ grid on
 semilogy(EbNo,SER,'b*');
 
 xlabel('Eb/No [dB]');
-ylabel('Symbol Error Rate');
-legend('16-QAM','16-QAM simulated');
-
-
-figure
 
 BERth = 3/8 * erfc((2/5*EbNolin).^0.5);
 
-semilogy(EbNo,BERth,'r-');
+semilogy(EbNo,BERth,'g-');
 hold on
 grid on
-semilogy(EbNo,BER,'b*');
-title('16-QAM Modulation - Bit Error Rate');
+semilogy(EbNo,BER,'bo');
+title('16-QAM Modulation');
 xlabel('Eb/No [dB]');
-ylabel('Bit Error Rate');
-legend('16-QAM','16-QAM Simulated');
+
+legend('SER','SER Simulated','BER ','BER Simulated');
+
+cleanfigure();
+matlab2tikz('qam16_BER.tex');
+
 
 %Plot della costellazione
 
 figure
 
 cloudplot(real(yrx),imag(yrx),[],'true');
-
-
+cleanfigure();
+matlab2tikz('qam16_cloud.tex');
 
 
 

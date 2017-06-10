@@ -51,7 +51,7 @@ Ps = mean(abs(x).^2);
 
 %AWGN
 
-EbNo = linspace(2,12,8);
+EbNo = [2:2:12];
 EbNolin = 10.^(EbNo./10);
 
 sigma = (Ps*Ns)./(nbit*EbNolin);
@@ -170,7 +170,7 @@ for ii = 1:length(EbNo)
      
 end
 
-EbNolin = 10.^(EbNo./10);
+
 
 
 SERth = 5/4 * erfc((0.5*EbNolin).^0.5) - 3/8 *erfc((0.5*EbNolin).^0.5).^2;
@@ -182,23 +182,16 @@ semilogy(EbNo,SERth,'r-');
 hold on
 grid on
 semilogy(EbNo,SER,'b*');
-title('Rectangular 8-QAM Modulation - Symbol Error Rate');
-xlabel('Eb/No [dB]');
-ylabel('Symbol Error Rate');
-legend('Rectangular 8-QAM','Rectangular 8-QAM Simulation');
 
 
-%Plot del BER
-figure
-
-semilogy(EbNo,BERth,'r-');
+semilogy(EbNo,BERth,'g-');
 hold on
 grid on
-semilogy(EbNo,BER,'b*');
-title('Rectangular 8-QAM Modulation - Bit Error Rate');
+semilogy(EbNo,BER,'bo');
+title('Rectangular 8-QAM Modulation');
 xlabel('Eb/No [dB]');
-ylabel('Bit Error Rate');
-legend('Rectangular 8-QAM','Rectangular 8-QAM Simulation');
+
+legend('SER','SER Simulated','BER','BER Simulated');
 
 %Plot della costellazione
 
