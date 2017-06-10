@@ -53,6 +53,11 @@ Y = X.*H;
 y = real(ifft(fftshift((Y))));
 eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
 
+
+cleanfigure();
+matlab2tikz('pam_ilpf_EYE.tex');
+
+
 pause
 
 topt = 6;
@@ -108,5 +113,9 @@ title('2-PAM Modulation with Ideal Low Pass Filter');
 semilogy(EbNo,BER,'b*');
 semilogy(EbNo,BERthMF,'b--');
 legend('ILPF theorical','ILPF simulation','Matched filter','Location','southwest');
+
+
+cleanfigure();
+matlab2tikz('pam_ilpf_BER.tex');
 
 

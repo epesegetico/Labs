@@ -33,7 +33,7 @@ stdev = sigma.^(1/2);
 
 %CREAZIONE DEL FILTRO 
 
-fp = 11;  % Studiare la variazione
+fp = 4;  % Studiare la variazione
 df = 1/Nbits;
 f = [-Ns/2:df:Ns/2-df];
 
@@ -45,6 +45,11 @@ H = 1./(1+(j*2*pi*f/fp));
   Y = X.*H.';
   y = real(ifft(fftshift(Y)));  
   eyediagram(y(1:1000*Ns),2*Ns,2*Ns)
+  
+  
+cleanfigure();
+matlab2tikz('pam_rc_EYE.tex');
+
   pause
 
 
@@ -98,3 +103,8 @@ semilogy(EbNo,BERthMF,'b--');
 xlabel('Eb/No [dB]');
 ylabel('BER');
 legend('RC filter','Simulated RC filter','Matched filter');
+
+
+
+cleanfigure();
+matlab2tikz('pam_rc_BER.tex');

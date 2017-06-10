@@ -20,7 +20,7 @@ Ps = mean(abs(x).^2);
 
 
 
-k = 4;
+k = 2;
 
 h = [1:1:Ns].^k;
 
@@ -29,6 +29,11 @@ h = h/sum(h);
 y = conv(x,h,'valid');
 
 eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
+
+
+cleanfigure();
+matlab2tikz('pam_tk_EYE.tex');
+
 
 figure
 
@@ -90,3 +95,8 @@ semilogy(EbNo,BER,'b*');
 semilogy(EbNo,BERthMF,'b--');
 
 legend('t^k','t^k simulated','Matched filter');
+
+
+
+cleanfigure();
+matlab2tikz('pam_tk_BER.tex');

@@ -93,6 +93,12 @@ h = 1/Ns*rectpulse(1,Ns);
 
 xnoiseless = conv(x,h,'valid');
 eyediagram(xnoiseless(1:1000*Ns),2*Ns,2*Ns)
+
+cleanfigure();
+matlab2tikz('pam_matched_EYE.tex');
+
+
+
 pause 
 
 Vth = 0;
@@ -141,6 +147,8 @@ title('2-PAM Modulation with Matched Filter');
 legend('Theorical Curve','Simulation');
 
 
+cleanfigure();
+matlab2tikz('pam_matched_BER.tex');
 
 %Si osserva che col diminuire di Nbits il comportamento si discosta molto
 %da quello teorico
