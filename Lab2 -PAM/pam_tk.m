@@ -19,8 +19,8 @@ x = rectpulse(ak,Ns);
 Ps = mean(abs(x).^2);
 
 
-
-k = 2;
+ 
+for k = 1:4
 
 h = [1:1:Ns].^k;
 
@@ -28,14 +28,13 @@ h = h/sum(h);
 
 y = conv(x,h,'valid');
 
-eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
+%eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
 
 
-cleanfigure();
-matlab2tikz('pam_tk_EYE.tex');
+%cleanfigure();
+%matlab2tikz('pam_tk_EYE.tex');
 
 
-figure
 
 
 %AWGN
@@ -95,8 +94,9 @@ semilogy(EbNo,BER,'b*');
 semilogy(EbNo,BERthMF,'b--');
 
 legend('t^k','t^k simulated','Matched filter');
+hold on
+pause
+end
 
-
-
-cleanfigure();
-matlab2tikz('pam_tk_BER.tex');
+%cleanfigure();
+%matlab2tikz('pam_tk_BER.tex');
