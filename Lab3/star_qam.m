@@ -188,22 +188,25 @@ legend('Upper Bound','Lower Bound','Simulation');
 
 %Plot del BER
 
-semilogy(EbNo,SER,'g-');
+semilogy(EbNo,upperSER,'g-');
 hold on
 grid on
-semilogy(EbNo,SER/log2(M),'g-');
+semilogy(EbNo,1.375*lowerSER/log2(M),'g-');
 semilogy(EbNo,BER,'bo');
 title('Star 8-QAM Modulation');
 xlabel('Eb/No [dB]');
-ylabel('Bit Error Rate');
-legend('SER Upper Bound','SER Lower Bound','SER Simulated','BER Upper Bound','BER Lower Bound','BER Simulated');
-cleanfigure();
-matlab2tikz('star_BER.tex');
+legend('SER and BER Upper Bound','SER Lower Bound','SER Simulated','BER Lower Bound','BER Simulated');
+
+
+% cleanfigure();
+% matlab2tikz('star_BER.tex');
+
+
 %Plot della costellazione
 
 figure
 
 cloudplot(real(yrx),imag(yrx),[],'true');
-
-cleanfigure();
-matlab2tikz('star_cloud.tex');
+% 
+% cleanfigure();
+% matlab2tikz('star_cloud.tex');

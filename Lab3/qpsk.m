@@ -165,19 +165,19 @@ SERth = erfc((EbNolin).^0.5) - 1/4 * (erfc(EbNolin.^0.5).^2);  %SER teorico per 
 
 BERth = SERth/nbit;
 
-semilogy(EbNo,SERth,'r-');
+%semilogy(EbNo,SERth,'r-');
 hold on
 grid on
-semilogy(EbNo,SER,'b*');
+semilogy(EbNo,SER,'r-');
 title('QPSK Modulation');
 xlabel('Eb/No [dB]');
 
 BERth = SERth./nbit;
 
-semilogy(EbNo,BERth,'g-');
-hold on
-grid on
-semilogy(EbNo,BER,'bo');
+% semilogy(EbNo,BERth,'g-');
+% hold on
+% grid on
+% semilogy(EbNo,BER,'bo');
 title('QPSK Modulation');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');

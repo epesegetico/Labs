@@ -1,7 +1,8 @@
 clear all
 close all
 
-[signal,Fs] = audioread('sound.mp3');
+%[signal,Fs] = audioread('sound.mp3');
+[signal,Fs] = audioread('voice.mp3');
 
 histogram(signal(:,1),'NumBins',100,'Normalization','pdf');
 axis([-2 2 0 5])
@@ -28,10 +29,10 @@ plot(f,S);
 axis([0 5000 min(S) max(S)])
 
 mu = 255;
-V = 1;
 
-signal = signal(:,1);
-signal = signal/max(abs(signal));
+
+signal = signal(:,1); 
+V = max(abs(signal(:)));
 
 sigout = compand(signal,mu,V,'mu/compressor');
 
@@ -78,7 +79,7 @@ for n=4:2:8
         vout = codebook(d+1);
         sigfinal = compand(vout,mu,V,'mu/expander');
         
-        e = sigfinal'-signal;
+        e = sigfinal-signal';
         SNR(i) = 10*log10(var(signal)/var(e));
         
     end
@@ -92,6 +93,17 @@ for n=4:2:8
     
     SNRth = 10*log10((M^2)./(1+4*(M^2-1).*Pbth));
     semilogx(Pbth,SNRth,'r-');
+    
+    xlabel('Pb(e)');
+    ylabel('SNR [dB]');
+    title('SNR vs Pb(e) -  Music sampled with Compander');
+    legend('Sound','Signal with uniform PDF');
+    %legend('Voice','Signal with uniform PDF');
+    
+    
+    hold on
+   
+    
     
 end
 

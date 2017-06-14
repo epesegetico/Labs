@@ -1,5 +1,5 @@
 %16QAM - FUNZIONA SE Ps è la potenza della costellazione
-close all
+
 clear all
 
 
@@ -275,35 +275,35 @@ SERth = 2.*p - p.^2;
 
 
 
-semilogy(EbNo,SERth,'r-');
+%semilogy(EbNo,SERth,'r-');
 hold on
 grid on
 semilogy(EbNo,SER,'b*');
 
 xlabel('Eb/No [dB]');
 
-BERth = 3/8 * erfc((2/5*EbNolin).^0.5);
+% BERth = 3/8 * erfc((2/5*EbNolin).^0.5);
+% 
+% semilogy(EbNo,BERth,'g-');
+% hold on
+% grid on
+% semilogy(EbNo,BER,'bo');
+% title('16-QAM Modulation');
+% xlabel('Eb/No [dB]');
+% 
 
-semilogy(EbNo,BERth,'g-');
-hold on
-grid on
-semilogy(EbNo,BER,'bo');
-title('16-QAM Modulation');
-xlabel('Eb/No [dB]');
 
-legend('SER','SER Simulated','BER ','BER Simulated');
-
-cleanfigure();
-matlab2tikz('qam16_BER.tex');
+% cleanfigure();
+% matlab2tikz('qam16_BER.tex');
 
 
 %Plot della costellazione
 
-figure
-
-cloudplot(real(yrx),imag(yrx),[],'true');
-cleanfigure();
-matlab2tikz('qam16_cloud.tex');
-
-
-
+% figure
+% 
+% cloudplot(real(yrx),imag(yrx),[],'true');
+% cleanfigure();
+% matlab2tikz('qam16_cloud.tex');
+% 
+% 
+% 

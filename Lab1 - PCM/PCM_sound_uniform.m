@@ -2,9 +2,14 @@ clear all
 close all
 
 [signal,Fs] = audioread('sound.mp3');
+%[signal,Fs] = audioread('voice.mp3');
 
 histogram(signal(:,1),'NumBins',100,'Normalization','pdf');
-axis([-2 2 0 5])
+title('Normalized PDF');
+axis([-1 1 0 5])
+
+%axis([-1 1 0 20])
+
 grid on
 
 figure
@@ -22,14 +27,15 @@ f = [-N/2:1:N/2-1]*df;
 
 
 S=abs(fftshift(fft(signal(:,1)))).^2;
-
+title('Power Spectral Density');
+grid on
 figure
 plot(f,S);
 axis([0 5000 min(S) max(S)])
 
 
 %Scegliamo soglia V=1 poichè il file audio è già compreso tra -1V e 1V
-V = 1;
+V = max(abs(signal));
     
 N = 1000000;
   
@@ -83,6 +89,12 @@ for n=4:2:8
     
     SNRth = 10*log10((M^2)./(1+4*(M^2-1).*Pbth));
     semilogx(Pbth,SNRth,'r-');
+    xlabel('Pb(e)');
+    ylabel('SNR [dB]');
+    title('PCM - Music sampled with Uniform Quantizer');
+    %title('PCM - Voice sampled with Uniform Quantizer');
+    legend('Music','Signal with uniform PDF');
+    %legend('Voice','Signal with uniform PDF');
     
    
 end

@@ -2,6 +2,8 @@ clear all
 close all
 
 [signal,Fs] = audioread('sound.mp3');
+%[signal,Fs] = audioread('voice.mp3');
+
 
 histogram(signal(:,1),'NumBins',100,'Normalization','pdf');
 axis([-2 2 0 5])
@@ -26,15 +28,17 @@ S=abs(fftshift(fft(signal(:,1)))).^2;
 figure
 plot(f,S);
 axis([0 5000 min(S) max(S)])
+grid on
 
 
 
-V = 1;
 signal = signal(:,1);
+V = max(abs(signal));
 
+figure
 for n=4:2:8
     
-   
+   n
     
     M = 2^n;
     delta = (2*V)/M;
@@ -43,7 +47,7 @@ for n=4:2:8
     tic
     [partition,codebook] = lloyds(signal,init_codebook);
     toc
-    pause
+   
     [index,quantv] = quantiz(signal,partition,codebook);
     
 
@@ -69,7 +73,7 @@ for n=4:2:8
         SNR(i) = 10*log10(var(signal)/var(e));
         
     end
-    figure
+ 
     semilogx(Pb,SNR,'bo');
     hold on
     grid on
@@ -79,9 +83,20 @@ for n=4:2:8
     
     SNRth = 10*log10((M^2)./(1+4*(M^2-1).*Pbth));
     semilogx(Pbth,SNRth,'r-');
-   
+    
+    xlabel('Pb(e)');
+    ylabel('SNR [dB]');
+    title('PCM - Music sampled with Lloyd Algorithm');
+    %title('PCM - Voice sampled with Lloyd Algorithm');
+    legend('Music','Signal with uniform PDF');
+    %legend('Voice','Signal with uniform PDF');
+    
+    
+  
     
 end
+
+
 
 
 

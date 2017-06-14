@@ -1,13 +1,12 @@
+% 2-PAM with RC filter - DA FINIRE
 clear all
 close all
 
-
-%2-PAM with ILPF
-
-Ns = 8;
+Ns = 24;
 Nbits = 1e6;  
 N = Ns*Nbits;
 nbit = 1;
+
 Rin = randi([0 1],[Nbits, 1]);
 
 ak = zeros(Nbits,1);
@@ -21,8 +20,7 @@ x = rectpulse(ak,Ns);
 Ps = mean(abs(x).^2);
 X = fftshift(fft(x));
 
-
-%AWGN 
+%AWGN
 
 EbNo = linspace(1,8,8);
 EbNolin = 10.^(EbNo./10);
@@ -34,56 +32,42 @@ stdev = sigma.^(1/2);
 
 
 %CREAZIONE DEL FILTRO 
-%Il filtro ideale va in frequenza da -B/2 a B/2 -> B è variabile
-%L'asse delle frequenze va da -Bsim/2 a Bsim/2
-%Bsim = Ns*Rs -> Poiché normalizziamo,Bsim/Rs = Ns
-%df = Ns/(Ns*Nbit) = 1/Nbit
 
+fp = 0.2;  % Studiare la variazione
 df = 1/Nbits;
-
-B = 1;  %Scegliere valore
-f = [-Ns/2:df:Ns/2-df]';
-H = abs(f)<B;
+f = [-Ns/2:df:Ns/2-df];
 
 
+H = 1./(1+(j*f/fp));
 
-%Situazione senza rumore
+%Prodotto senza rumore e eye diagram
 
-Y = X.*H;
-y = real(ifft(fftshift((Y))));
-eyediagram(y(1:1000*Ns),2*Ns,2*Ns);
-grid on
+  Y = X.*H.';
+  y = real(ifft(fftshift(Y)));  
+  eyediagram(y(1:1000*Ns),2*Ns,2*Ns)
+  
+    
+  cleanfigure();
+matlab2tikz('pam_rc_EYE.tex');
 
 
-cleanfigure();
-matlab2tikz('pam_ilpf_EYE.tex');
-
-
-pause
-
-topt = 4;
 Vth = 0;
+topt = Ns;
 
 for ii = 1:length(EbNo)
-    
     noise = stdev(ii).*randn(N,1);
     xtx = x+noise(:);
-   
-   
+    
+
     
     Xtx = fftshift(fft(xtx));
     
     %eyediagram(xrx(1:1000*Ns),2*Ns,2*Ns);
-    Xrx = Xtx.*H;
-    
+    Xrx = Xtx.*H.';
     
     xrx = real(ifft(fftshift(Xrx)));
-        
-    
-    
+     
     y = xrx(topt:Ns:end);  
-    
-    %Decision Treshold
     
     for jj = 1:1:length(y)
         if y(jj)>Vth
@@ -99,24 +83,26 @@ for ii = 1:length(EbNo)
     
     BER(ii) = errors/Nbits;
     
-   
 end
 
 
-BERth = 1/2 * erfc((EbNolin/(2*B)).^0.5);  %BER Teorico per 2-PAM con ILPF
+
+BERth = 1/2 * erfc((EbNolin.^0.5) * (2/(2*pi*fp)).^0.5 * (1-exp(-2*pi*fp)));  %BER Teorico per 2-PAM con RC
 BERthMF = 1/2 * erfc((EbNolin).^0.5); 
+
+figure
+
 semilogy(EbNo,BERth,'r-');
 hold on
 grid on
+semilogy(EbNo,BER,'b*');
+hold on
+semilogy(EbNo,BERthMF,'b--');
 xlabel('Eb/No [dB]');
 ylabel('BER');
-title('2-PAM Modulation with Ideal Low Pass Filter');
-semilogy(EbNo,BER,'b*');
-semilogy(EbNo,BERthMF,'b--');
-legend('ILPF theorical','ILPF simulation','Matched filter','Location','southwest');
-
+title('RC Filter - Optimal Filter Bandwidth = 0.2');
+legend('RC filter','Simulated RC filter','Matched filter');
 
 cleanfigure();
-matlab2tikz('pam_ilpf_BER.tex');
-
+matlab2tikz('pam_rc_BER.tex');
 

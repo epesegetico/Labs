@@ -35,21 +35,21 @@ clear all
 
 
 V = 8;
-    
-    N = 5000000;
-    
-    signal = -V + (2*V).*rand(N,1);
-    
-    histogram(signal,'NumBins',50,'BinLimits',[-V V],'Normalization','pdf');
-    axis([-10 10 0 0.1])
-    grid on
-    
-    
 
-    
+N = 5000000;
+
+signal = -V + (2*V).*rand(N,1);
+
+histogram(signal,'NumBins',50,'BinLimits',[-V V],'Normalization','pdf');
+axis([-10 10 0 0.1])
+grid on
+
+
+
+
 for n=4:2:8
     
-   
+    
     
     M = 2^n;
     delta = (2*V)/M;
@@ -59,7 +59,7 @@ for n=4:2:8
     
     [index,quantv] = quantiz(signal,partition,codebook);
     
-
+    
     %ENCODER
     b = de2bi(index,n);
     
@@ -91,9 +91,12 @@ for n=4:2:8
     
     SNRth = 10*log10((M^2)./(1+4*(M^2-1).*Pbth));
     semilogx(Pbth,SNRth,'r-');
-   
     
-     
+    xlabel('Pb(e)');
+    ylabel('SNR [dB]');
+    legend('Simulated','Theorical');
+    title('PCM - Uniform quantization and signal with uniform PDF');
+    
 end
 
 

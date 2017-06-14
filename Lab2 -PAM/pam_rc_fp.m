@@ -2,7 +2,7 @@
 clear all
 close all
 
-Ns = 12;
+Ns = 24;
 Nbits = 1e6;  
 N = Ns*Nbits;
 nbit = 1;
@@ -22,7 +22,7 @@ X = fftshift(fft(x));
 
 %AWGN
 
-EbNo = linspace(1,8,8);
+EbNo = 8;
 EbNolin = 10.^(EbNo./10);
 sigma = (Ps*Ns)./(2*nbit*EbNolin); 
 
@@ -33,22 +33,19 @@ stdev = sigma.^(1/2);
 
 %CREAZIONE DEL FILTRO 
 
-fp = 4;  % Studiare la variazione
+
 df = 1/Nbits;
 f = [-Ns/2:df:Ns/2-df];
 
 
-H = 1./(1+(j*2*pi*f/fp));
+H = 1./(1+(j*f./fp));
 
 %Prodotto senza rumore e eye diagram
 
   Y = X.*H.';
   y = real(ifft(fftshift(Y)));  
-  eyediagram(y(1:1000*Ns),2*Ns,2*Ns)
+  %eyediagram(y(1:1000*Ns),2*Ns,2*Ns)
   
-  
-cleanfigure();
-matlab2tikz('pam_rc_EYE.tex');
 
   pause
 
@@ -56,7 +53,14 @@ matlab2tikz('pam_rc_EYE.tex');
 Vth = 0;
 topt = Ns;
 
-for ii = 1:8
+fp = [0.1:0.1:1.5];
+
+for counter = 1:length(fp)
+    
+    counter
+    
+    H = 1./(1+(j*f./fp(counter)));
+for ii = 1:length(EbNo)
     noise = stdev(ii).*randn(N,1);
     xtx = x+noise(:);
     
@@ -65,6 +69,8 @@ for ii = 1:8
     Xtx = fftshift(fft(xtx));
     
     %eyediagram(xrx(1:1000*Ns),2*Ns,2*Ns);
+    
+    
     Xrx = Xtx.*H.';
     
     xrx = real(ifft(fftshift(Xrx)));
@@ -83,28 +89,43 @@ for ii = 1:8
     errors = sum(abs(y-Rin));
 
     
-    BER(ii) = errors/Nbits;
     
+    
+end
+    
+BER(counter) = errors/Nbits;
+
+BERth(counter) = 1/2 * erfc((EbNolin(ii).^0.5) * (2/(2*pi*fp(counter))).^0.5 * (1-exp(-2*pi*fp(counter)))); 
+
+
+
+
 end
 
 
 
-BERth = 1/2 * erfc((EbNolin.^0.5) * (2/fp).^0.5 * (1-exp(-fp)));  %BER Teorico per 2-PAM con RC
+
+
+%BERth = 1/2 * erfc((EbNolin.^0.5) * (2/(2*pi*fp)).^0.5 * (1-exp(-2*pi*fp)));  %BER Teorico per 2-PAM con RC
+
+
+
 BERthMF = 1/2 * erfc((EbNolin).^0.5); 
 
 figure
-
-semilogy(EbNo,BERth,'r-');
+% 
+semilogy(fp,BERth,'r-*');
 hold on
 grid on
-semilogy(EbNo,BER,'b*');
+semilogy(fp,BER,'b-*');
 hold on
-semilogy(EbNo,BERthMF,'b--');
-xlabel('Eb/No [dB]');
+
+xlabel('fp');
 ylabel('BER');
-legend('RC filter','Simulated RC filter','Matched filter');
+title('BER vs fp - Eb/No = 8 dB');
+legend('RC filter','Simulated RC filter');
 
 
 
-cleanfigure();
-matlab2tikz('pam_rc_BER.tex');
+% cleanfigure();
+% matlab2tikz('pam_rc_FP.tex');
